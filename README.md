@@ -202,3 +202,12 @@ docker compose up -d
  ⠿ Network compose_default  Created                                                                                                                                            0.0s
  ⠿ Container mysql          Started                                                                                                                                            0.3s
  ⠿ Container phpmyadmin     Started
+
+
+### a. Qu’apporte le fichier docker-compose par rapport aux commandes docker run ? Pourquoi est-il intéressant ? (cf. ce qui a été présenté pendant le cours)
+- Le fichier est plus structuré et donne donc plus de visibilité à la configuration par rapport au CLI.
+- Nous n'avons pas besoin de lancer 2 commandes, les conteneurs se lancent directement à la suite
+- En faisant un docker compose down, cela supprime tous les conteneurs qui ont été lancés dans le fichier (Gain en temps)
+
+### b. Quel moyen permet de configurer (premier utilisateur, première base de données, mot de passe root, …) facilement le conteneur mysql au lancement ?
+> En utilisant l'environnement
