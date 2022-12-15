@@ -202,7 +202,7 @@ docker compose up -d
  ⠿ Network compose_default  Created                                                                                                                                            0.0s
  ⠿ Container mysql          Started                                                                                                                                            0.3s
  ⠿ Container phpmyadmin     Started
-
+```
 
 ### a. Qu’apporte le fichier docker-compose par rapport aux commandes docker run ? Pourquoi est-il intéressant ? (cf. ce qui a été présenté pendant le cours)
 - Le fichier est plus structuré et donne donc plus de visibilité à la configuration par rapport au CLI.
