@@ -303,5 +303,5 @@ docker inspect mysql
 - mysql est dans le réseau backend avec une adresse IP en 172.30.0.2
 
 ### c. Dans quelle situation réelles (avec quelles images) pourrait-on avoir cette configuration réseau ? Dans quel but ?
-> Nous pouvons utiliser cette configuration pour isoler différents serveurs qui gèrent des fichiers confidentiels par exemple (image ubuntu)
+> Nous pouvons utiliser cette configuration pour isoler différents serveurs qui gèrent des fichiers confidentiels par exemple (image ubuntu).
 > Nous pouvons également isoler les bases de données pour que seuls certains serveurs puissent y accéder (image mysql)
