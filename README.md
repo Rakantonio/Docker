@@ -9,39 +9,39 @@ https://docs.docker.com/compose/install/linux/
 - Créer un script installDocker.sh
 - Lancer le script 
 
-```bash
+```bash=
 chmod 755 installDocker.sh
 ./installDocker.sh
 ```
 
 ## Quelques commandes à tester
-```
+```bash=
 docker run hello-world
 ```
 ![](https://i.imgur.com/6abfUSl.png)
 
-```
+```bash=
 docker run -it ubuntu bash
 ```
 ![](https://i.imgur.com/8svtVna.png)
 
-```
+```bash=
 docker images
 ```
 ![](https://i.imgur.com/1zZTurU.png)
 
-```
+```bash=
 docker ps -a
 ```
 ![](https://i.imgur.com/DklFqCT.png)
 
-```
+```bash=
 docker run -p 80:80 nginx
 ```
 ![](https://i.imgur.com/d5kDTV8.png)
 ![](https://i.imgur.com/S2kHuWu.png)
 
-```
+```bash=
 docker run -d -p 80:80 nginx
 ```
 ![](https://i.imgur.com/xSqxjst.png)
@@ -56,7 +56,7 @@ docker run -d -p 80:80 nginx
 https://hub.docker.com/_/nginx
 
 ```bash=
-root@WINDELL-5N29K7U:~/Conteneurisation-Docker$ docker pull nginx
+docker pull nginx
 Using default tag: latest
 latest: Pulling from library/nginxDigest: sha256:75263be7e5846fc69cb6c42553ff9c93d653d769b94917dbda71d42d3f3c00d3
 Status: Image is up to date for nginx:latest
@@ -75,14 +75,14 @@ hello-world   latest    feb5d9fea6a5   14 months ago   13.3kB
 ```
 
 ### c. Créer un fichier index.html simple
-```bash
+```bash=
 mkidr nginx
 touch index.html
 ```
 
 ### d. Démarrer un conteneur et servir la page html créée précédemment à l’aide d’un volume (option -v de docker run)
 
-```bash
+```bash=
 docker run --name srv-nginx -d -p 80:80 -v /home/kube/nginx/index.html:/usr/share/nginx/html/index.html nginx
 d5e1385e096f31e9f0c7b2b418c74d158efde040e164122f03890dbaca2e7f97
 ```
@@ -90,7 +90,7 @@ d5e1385e096f31e9f0c7b2b418c74d158efde040e164122f03890dbaca2e7f97
 
 ### e. Supprimer le conteneur précédent et arriver au même résultat que précédemment à l’aide de la commande docker cp
 
-```bash
+```bash=
 docker stop srv-nginx
 srv-nginx
 
@@ -112,13 +112,13 @@ coucou
 
 ### a. A l’aide d’un Dockerfile, créer une image (commande docker build)
 
-```dockerfile
+```dockerfile=
 vim nginx/Dockerfile
 
 FROM nginx
 COPY index.html /usr/share/nginx/html/index.html
 ```
-```bash
+```bash=
 docker build . -t custom-nginx
 docker images
 REPOSITORY     TAG       IMAGE ID       CREATED              SIZE
@@ -128,7 +128,7 @@ nginx          latest    3964ce7b8458   33 hours ago         142MB
 
 ### b. Exécuter cette nouvelle image de manière à servir la page html (commande docker run)
 
-```
+```bash=
 docker run --name srv-nginx -p 80:80 -d custom-nginx
 42325bbda33dae01504e25e966c23f38f3856feb22f32ca1f029360214cc7143
 ```
@@ -143,7 +143,7 @@ docker run --name srv-nginx -p 80:80 -d custom-nginx
 
 ### a. Récupérer les images mysql:5.7 et phpmyadmin/phpmyadmin depuis le Docker Hub
 
-```
+```bash=
 docker pull mysql:5.7
 docker pull phpmyadmin
 docker images
@@ -154,7 +154,7 @@ phpmyadmin     latest    8907e33feea6   8 days ago       511MB
 
 ### b. Exécuter deux conteneurs à partir des images et ajouter une table ainsi que quelques enregistrements dans la base de données à l’aide de phpmyadmin
 
-```
+```bash=
 docker run --name mysql-srv -p 3306:3306 -e MYSQL_ROOT_PASSWORD=P@ssw0rd
 s -d mysql:5.7
 a94834027e500ecae09d9b9d9ca3f0c69bb1ddfe28eecc87bcfd35f9772cd9a9
@@ -170,7 +170,7 @@ b9f9848b9a7b402f07c0e7f5e6d324422d4ea474927206a87713be997058f475
 
 ## 4. Faire la même chose que précédemment en utilisant un fichier docker-compose
 
-```yaml
+```yaml=
 version: '3.1'
 
 services:
@@ -196,7 +196,7 @@ services:
     depends_on:
       - db
 ```
-```
+```bash
 docker compose up -d
 [+] Running 3/3
  ⠿ Network compose_default  Created                                                                                                                                            0.0s
@@ -210,4 +210,98 @@ docker compose up -d
 - En faisant un docker compose down, cela supprime tous les conteneurs qui ont été lancés dans le fichier (Gain en temps)
 
 ### b. Quel moyen permet de configurer (premier utilisateur, première base de données, mot de passe root, …) facilement le conteneur mysql au lancement ?
-> En utilisant l'environnement
+> En utilisant l'environnement (variables d'environnement)
+
+## 5. Observation de l’isolation réseau entre 3 conteneurs
+
+### a. A l’aide de docker-compose et de l’image praqma/network-multitool disponible sur le Docker Hub créer 3 services (web, app et db) et 2 réseaux (frontend et backend).Les services web et db ne devront pas pouvoir effectuer de ping de l’un vers l’autre
+
+```bash=
+docker pull praqma/network-multitool
+docker images
+REPOSITORY                 TAG       IMAGE ID       CREATED         SIZE
+praqma/network-multitool   latest    1631e536ed7d   11 months ago   39.9MB
+```
+
+- Création du docker compose
+```bash=
+mkdir network-compose
+touch network-compose/docker-compose.yml
+``` 
+```yaml=
+version: '3.1'
+
+services:
+
+  db:
+    image: mysql:5.7
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: P@ssw0rd
+      MYSQL_DATABASE: test
+    ports:
+      - 3306:3306
+    networks:
+      - backend
+
+
+  web:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY= 1
+    links:
+      - db
+    networks:
+      - frontend
+
+
+  app:
+    image: praqma/network-multitool
+    container_name: network-multitool
+    restart: always
+    networks:
+      - frontend
+      - backend
+
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+```
+```bash=
+docker compose up -d
+[+] Running 3/3
+ ⠿ Container network-multitool  Started                                                                                                                                        0.8s
+ ⠿ Container mysql              Started                                                                                                                                        0.5s
+ ⠿ Container phpmyadmin         Started                                                                                                                                        1.1s
+
+```
+
+> Les 2 conteneurs mysql et phpmyadmin ne peuvent donc pas se communiquer entre eux
+
+![](https://i.imgur.com/O53Nlqt.png)
+
+### b. Quelles lignes du résultat de la commande docker inspect justifient ce comportement ?
+```bash=
+docker inspect phpmyadmin
+```
+On peut voir les lignes suivantes : 
+- phpmyadmin est dans le réseau frontend avec une adresse IP en 172.29.0.3
+![](https://i.imgur.com/deQV4QE.png)
+
+```bash=
+docker inspect mysql
+```
+![](https://i.imgur.com/i9lsUoU.png)
+- mysql est dans le réseau backend avec une adresse IP en 172.30.0.2
+
+### c. Dans quelle situation réelles (avec quelles images) pourrait-on avoir cette configuration réseau ? Dans quel but ?
+> Nous pouvons utiliser cette configuration pour isoler différents serveurs qui gèrent des fichiers confidentiels par exemple (image ubuntu)
+> Nous pouvons également isoler les bases de données pour que seuls certains serveurs puissent y accéder (image mysql)
