@@ -170,6 +170,10 @@ b9f9848b9a7b402f07c0e7f5e6d324422d4ea474927206a87713be997058f475
 
 ## 4. Faire la même chose que précédemment en utilisant un fichier docker-compose
 
+```bash=
+mkidr compose
+touch compose/docker-compose.yml
+```
 ```yaml=
 version: '3.1'
 
